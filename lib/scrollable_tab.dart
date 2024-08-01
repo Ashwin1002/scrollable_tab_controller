@@ -1,4 +1,4 @@
-library scrollabel_tab;
+library scrollable_tab;
 
 import 'dart:developer';
 import 'package:flutter/material.dart';
