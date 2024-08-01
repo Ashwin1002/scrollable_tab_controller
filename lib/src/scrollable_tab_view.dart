@@ -1,14 +1,17 @@
-import 'dart:developer';
-
-import 'package:flutter/material.dart';
-import 'package:scrollable_tab/controller/scrollable_tab_controller.dart';
-import 'package:scrollable_tab/model/tab_header_items.dart';
+part of '../scrollable_tab.dart';
 
 typedef TabHeaderBuilder<T> = Widget Function(TabInfo<T> header);
+
 typedef GroupHeaderBuilder<T> = Widget Function(TabHeaderItems<T> header);
+
 typedef ItemBuilder<T> = Widget Function(T item);
 
+/// A widget that provides a scrollable tab view with headers and items.
+///
+/// The [ScrollableTabView] supports both default and custom controllers for managing
+/// the state and behavior of the tabs and scroll view.
 class ScrollableTabView<T> extends StatefulWidget {
+  /// Creates a [ScrollableTabView] with the provided tab items and builders.
   const ScrollableTabView({
     super.key,
     required this.tabItems,
@@ -18,6 +21,7 @@ class ScrollableTabView<T> extends StatefulWidget {
   })  : controller = null,
         _scrollController = null;
 
+  /// Creates a [ScrollableTabView] with a custom controller and optional scroll controller.
   const ScrollableTabView.custom({
     super.key,
     required this.tabHeaderBuilder,
@@ -28,11 +32,22 @@ class ScrollableTabView<T> extends StatefulWidget {
   })  : tabItems = const [],
         _scrollController = scrollController;
 
+  /// The controller for managing the tab view's state.
   final ScrollableTabController<T>? controller;
+
+  /// The optional scroll controller for the list view.
   final ScrollController? _scrollController;
+
+  /// The list of tab items.
   final List<TabHeaderItems<T>> tabItems;
+
+  /// The builder for creating tab headers.
   final TabHeaderBuilder<T> tabHeaderBuilder;
+
+  /// The builder for creating group headers.
   final GroupHeaderBuilder<T> groupHeaderBuilder;
+
+  /// The builder for creating items.
   final ItemBuilder<T> itemBuilder;
 
   @override
@@ -49,6 +64,8 @@ class _ScrollableTabViewState<T> extends State<ScrollableTabView<T>>
   final GlobalKey _headerKey = GlobalKey();
   final GlobalKey _itemKey = GlobalKey();
 
+  bool _hideOffsetWidget = false;
+
   @override
   void initState() {
     super.initState();
@@ -63,6 +80,7 @@ class _ScrollableTabViewState<T> extends State<ScrollableTabView<T>>
     });
   }
 
+  /// Calculates the initial sizes of the header and item extents after the first frame.
   void _calculateInitialSizes() {
     final headerContext = _headerKey.currentContext;
     final itemContext = _itemKey.currentContext;
@@ -84,6 +102,7 @@ class _ScrollableTabViewState<T> extends State<ScrollableTabView<T>>
     log('item extent => $itemExtent\nheader extent => $headerExtent');
 
     if (headerExtent != 0 && itemExtent != 0) {
+      _hideOffsetWidget = true;
       _controller.calculateOffset(headerExtent, itemExtent);
     }
   }
@@ -104,28 +123,30 @@ class _ScrollableTabViewState<T> extends State<ScrollableTabView<T>>
     return AnimatedBuilder(
       animation: _controller,
       builder: (_, __) {
+        if (!_hideOffsetWidget) {
+          return Offstage(
+            offstage: true,
+            child: Column(
+              children: [
+                SizedBox(
+                  key: _headerKey,
+                  child: _controller.tabItems.isNotEmpty
+                      ? widget.groupHeaderBuilder(_controller.tabItems.first)
+                      : const SizedBox.shrink(),
+                ),
+                SizedBox(
+                  key: _itemKey,
+                  child: widget.tabItems.isNotEmpty &&
+                          widget.tabItems.first.items.isNotEmpty
+                      ? widget.itemBuilder(widget.tabItems.first.items.first)
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          );
+        }
         return Column(
           children: [
-            Offstage(
-              offstage: true,
-              child: Column(
-                children: [
-                  SizedBox(
-                    key: _headerKey,
-                    child: _controller.tabItems.isNotEmpty
-                        ? widget.groupHeaderBuilder(_controller.tabItems.first)
-                        : const SizedBox.shrink(),
-                  ),
-                  SizedBox(
-                    key: _itemKey,
-                    child: widget.tabItems.isNotEmpty &&
-                            widget.tabItems.first.items.isNotEmpty
-                        ? widget.itemBuilder(widget.tabItems.first.items.first)
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ),
-            ),
             TabBar(
               onTap: _controller.onCategorySelected,
               controller: _controller.tabController,
