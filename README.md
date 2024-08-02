@@ -28,7 +28,7 @@ import 'package:scrollable_tab/scrollable_tab.dart';
 ### Define your tab header items
 
 ```dart
-import 'package:scrollable_tab/scrollable_tab';
+import 'package:scrollable_tab/scrollable_tab.dart';
 
 final tabItems = [
   TabHeaderItems(
@@ -144,8 +144,7 @@ A widget that provides a scrollable tab view.
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:scrollable_tab_view/scrollable_tab_view.dart';
-import 'package:scrollable_tab_view/model/tab_header_items.dart';
+import 'package:scrollable_tab/scrollable_tabdart';
 
 final tabItems = [
   TabHeaderItems(

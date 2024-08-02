@@ -108,8 +108,17 @@ class _ScrollableTabViewState<T> extends State<ScrollableTabView<T>>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   void didUpdateWidget(covariant ScrollableTabView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    oldWidget.controller?.scrollController
+        .removeListener(oldWidget.controller!._onScrollListener);
+    widget.controller?.addListener(widget.controller!._onScrollListener);
   }
 
   @override
