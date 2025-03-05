@@ -155,6 +155,7 @@ class _ScrollableTabViewState<T> extends State<ScrollableTabView<T>>
           );
         }
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TabBar(
               onTap: _controller.onCategorySelected,
@@ -162,11 +163,19 @@ class _ScrollableTabViewState<T> extends State<ScrollableTabView<T>>
               isScrollable: true,
               indicatorWeight: .1,
               indicatorColor: Colors.transparent,
+              tabAlignment: TabAlignment.start,
               tabs: _controller.tabs
                   .map((e) => widget.tabHeaderBuilder(e))
                   .toList(),
-              labelColor: Colors.transparent,
+              // labelColor: ,
               splashFactory: NoSplash.splashFactory,
+              labelStyle: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+              unselectedLabelStyle:
+                  Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w400,
+                      ),
             ),
             Flexible(
               child: ListView.builder(
